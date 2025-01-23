@@ -1,19 +1,11 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   main.cpp                                           :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: jeberle <jeberle@student.42.fr>            +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/08 14:41:01 by jeberle           #+#    #+#             */
-/*   Updated: 2025/01/08 14:42:57 by jeberle          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
+#include "ScalarConverter.hpp"
 
-# include <iostream>
+int main(int argc, char **argv) {
+	if (argc != 2) {
+		std::cout << "Usage: " << argv[0] << " <literal>" << std::endl;
+		return 1;
+	}
 
-int main() {
-
-	std::cout << "Hello World!" << std::endl;
+	ScalarConverter::convert(argv[1]);
 	return 0;
 }
