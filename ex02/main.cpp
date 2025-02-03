@@ -3,6 +3,8 @@
 #include "./A.hpp"
 #include "./B.hpp"
 #include "./C.hpp"
+#include <cstdlib>
+#include <ctime>
 
 Base* generate(void) {
 	int random = std::rand() % 3;
