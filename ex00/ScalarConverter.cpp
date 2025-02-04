@@ -6,6 +6,11 @@ void ScalarConverter::convert(const std::string &literal) {
 		return;
 	}
 
+	if (literal.length() > MAX_INPUT_LENGTH) {
+		std::cout << "Error: Input too long" << std::endl;
+		return;
+	}
+
 	if (literal == "nan" || literal == "nanf" ||
 		literal == "+inf" || literal == "+inff" ||
 		literal == "-inf" || literal == "-inff" ||
@@ -14,15 +19,19 @@ void ScalarConverter::convert(const std::string &literal) {
 		return;
 	}
 
-	if (literal.length() == 1 && !isdigit(literal[0])) {
+	if (literal.length() == 1 && !std::isdigit(static_cast<unsigned char>(literal[0]))){
 		convertFromChar(literal[0]);
 		return;
 	}
 
 	if (isInt(literal)) {
-		char *end;
-		long long tmp = std::strtoll(literal.c_str(), &end, 10);
-		if (*end != '\0' || tmp > std::numeric_limits<int>::max() ||
+		std::stringstream ss(literal);
+		long long tmp;
+		if (!(ss >> tmp) || !ss.eof()) {
+			std::cout << "Error: Invalid integer conversion" << std::endl;
+			return;
+		}
+		if (tmp > std::numeric_limits<int>::max() ||
 			tmp < std::numeric_limits<int>::min()) {
 			std::cout << "Error: Integer overflow" << std::endl;
 			return;
@@ -32,7 +41,13 @@ void ScalarConverter::convert(const std::string &literal) {
 	}
 
 	if (isFloat(literal)) {
-		float value = std::atof(literal.c_str());
+		std::string numPart = literal.substr(0, literal.length() - 1);
+		std::stringstream ss(numPart);
+		float value;
+		if (!(ss >> value) || !ss.eof()) {
+			std::cout << "Error: Invalid float conversion" << std::endl;
+			return;
+		}
 		convertFromFloat(value);
 		return;
 	}
@@ -40,7 +55,12 @@ void ScalarConverter::convert(const std::string &literal) {
 	size_t firstDot = literal.find('.');
 	size_t lastDot = literal.rfind('.');
 	if (firstDot != std::string::npos && firstDot == lastDot && literal[literal.length() - 1] != 'f') {
-		double value = std::atof(literal.c_str());
+		std::stringstream ss(literal);
+		double value;
+		if (!(ss >> value) || !ss.eof()) {
+			std::cout << "Error: Invalid double conversion" << std::endl;
+			return;
+		}
 		convertFromDouble(value);
 		return;
 	}
@@ -57,7 +77,7 @@ bool ScalarConverter::isInt(const std::string &literal) {
 	if (literal[0] == '+' || literal[0] == '-')
 		i++;
 	for (; i < literal.length(); i++) {
-		if (!isdigit(literal[i]))
+		if (!std::isdigit(static_cast<unsigned char>(literal[i])))
 			return false;
 	}
 	return true;
@@ -68,27 +88,18 @@ bool ScalarConverter::isFloat(const std::string &literal) {
 		return false;
 
 	std::string numPart = literal.substr(0, literal.length() - 1);
-	size_t pos = 0;
-
-	try {
-		std::stod(numPart, &pos);
-		return pos == numPart.length();
-	} catch (...) {
-		return false;
-	}
+	std::stringstream ss(numPart);
+	double value;
+	return (ss >> value) && ss.eof();
 }
 
 bool ScalarConverter::isDouble(const std::string &literal) {
 	if (literal == "-inf" || literal == "+inf" || literal == "inf" || literal == "nan")
 		return true;
 
-	size_t pos = 0;
-	try {
-		std::stod(literal, &pos);
-		return pos == literal.length();
-	} catch (...) {
-		return false;
-	}
+	std::stringstream ss(literal);
+	double value;
+	return (ss >> value) && ss.eof();
 }
 
 void ScalarConverter::convertFromChar(const char value) {
@@ -166,15 +177,20 @@ void ScalarConverter::convertFromDouble(const double value) {
 		std::cout << "int: " << static_cast<int>(value) << std::endl;
 
 	std::cout << "float: ";
-	if (std::isnan(value)) std::cout << "nanf";
-	else if (std::isinf(value)) std::cout << (value < 0 ? "-inff" : "+inff");
-	else if (value == 0.0) std::cout << "0.0f";
+	if (std::isnan(value))
+		std::cout << "nanf";
+	else if (std::isinf(value))
+		std::cout << (value < 0 ? "-inff" : "+inff");
+	else if (value == 0.0)
+		std::cout << "0.0f";
 	else {
 		const bool useScientific = std::abs(value) >= 1e6 || (value != 0 && std::abs(value) < 1e-3);
 		if (useScientific) {
 			std::cout << std::scientific << std::setprecision(5) << static_cast<float>(value) << "f";
 		} else {
-			std::string strValue = std::to_string(value);
+			std::ostringstream ss;
+			ss << value;
+			std::string strValue = ss.str();
 			size_t decimalPos = strValue.find('.');
 			size_t precision = 1;
 			if (decimalPos != std::string::npos) {
@@ -189,15 +205,20 @@ void ScalarConverter::convertFromDouble(const double value) {
 	std::cout << std::endl;
 
 	std::cout << "double: ";
-	if (std::isnan(value)) std::cout << "nan";
-	else if (std::isinf(value)) std::cout << (value < 0 ? "-inf" : "+inf");
-	else if (value == 0.0) std::cout << "0.0";
+	if (std::isnan(value))
+		std::cout << "nan";
+	else if (std::isinf(value))
+		std::cout << (value < 0 ? "-inf" : "+inf");
+	else if (value == 0.0)
+		std::cout << "0.0";
 	else {
 		const bool useScientific = std::abs(value) >= 1e6 || (value != 0 && std::abs(value) < 1e-3);
 		if (useScientific) {
 			std::cout << std::scientific << std::setprecision(5) << value;
 		} else {
-			std::string strValue = std::to_string(value);
+			std::ostringstream ss;
+			ss << value;
+			std::string strValue = ss.str();
 			size_t decimalPos = strValue.find('.');
 			size_t precision = 1;
 			if (decimalPos != std::string::npos) {

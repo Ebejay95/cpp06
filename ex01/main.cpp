@@ -11,7 +11,7 @@ int main() {
 	std::cout << "Original address: " << &barny << std::endl;
 	std::cout << "After deserialization: " << rawBarny << " which represents: " << ptrBarny << std::endl;
 	std::cout << "Deserialized data: " << ptrBarny->name << " | Age: " << ptrBarny->age
-	          << " | Height: " << ptrBarny->height << "m" << std::endl;
+			<< " | Height: " << ptrBarny->height << "m" << std::endl;
 
 	std::cout << std::endl;
 
@@ -22,7 +22,7 @@ int main() {
 	std::cout << "Original address: " << &elly << std::endl;
 	std::cout << "After deserialization: " << rawElly << " which represents: " << ptrElly << std::endl;
 	std::cout << "Deserialized data: " << ptrElly->name << " | Age: " << ptrElly->age
-	          << " | Height: " << ptrElly->height << "m" << std::endl;
+			<< " | Height: " << ptrElly->height << "m" << std::endl;
 
 	std::cout << std::endl;
 }

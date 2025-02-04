@@ -1,12 +1,14 @@
 #ifndef SCALARCONVERTER_HPP
 #define SCALARCONVERTER_HPP
 
-#include <string>
 #include <iostream>
 #include <cstdlib>
 #include <limits>
 #include <cmath>
 #include <iomanip>
+#include <sstream>
+
+#define MAX_INPUT_LENGTH 20
 
 	class ScalarConverter {
 		private:
